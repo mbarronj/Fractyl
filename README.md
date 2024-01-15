@@ -13,3 +13,5 @@ Just keep in mind that I may take longer than usual to respond, and will likely 
 
 If you use, please let me know how it goes.
 
+Everything needs to reside in the FreeCAD Macro's folder for any of these scripts to function.
+On my Windows machine, this is "Users/username/AppData/Roaming/FreeCAD/Macros".
