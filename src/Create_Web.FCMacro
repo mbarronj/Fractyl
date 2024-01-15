@@ -1,0 +1,38 @@
+# Create material between keyplates
+import FreeCAD as App
+import FreeCADGui as Gui
+import json
+import math
+from FreeCAD import Base
+
+import Rotate_To_Fingers
+
+####
+# We will need to access the active document 
+# and get already create objects for reference
+# Refernce: https://github.com/FreeCAD/FreeCAD-documentation/blob/main/wiki/Code_snippets.md
+####
+
+doc = App.ActiveDocument
+objs = FreeCAD.ActiveDocument.Objects 
+
+####
+# From same reference, if we were working with a selection:
+# sel = FreeCADGui.Selection.getSelection()   # Select an object
+# for j in enumerate(sel[0].Shape.Edges): would get edges
+# Assuming we can enumerate through objects as well, get the Shape, then geo objects
+####
+for obj in objs:
+    #App.Console.PrintMessage(obj) # Prints <Part::PartFeature>
+    
+    
+
+####
+# Generate Web Geo Primatives
+# Here we have options. 
+# I think the most stable way is probably to either create copies of geometry, then fuse
+# or, use points -> create edges -> create a wire -> create a solid -> fuse
+# all fuses will probably have to happen LAST. since 
+####
+
+
