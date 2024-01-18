@@ -17,7 +17,7 @@ __Author__ = 'mbarronj'
 __Version__ = '0.0.1'
 __Date__ = '2024-01-16'
 __License__ = 'LGPL-3.0-or-later'
-__Web__ = 'http://wauthintelligence.com'
+__Web__ = 'http://authintelligence.com'
 __Wiki__ = ''
 __Icon__ = ''
 __Help__ = 'Try it out and play with it. It should be self explanatory'
@@ -26,4 +26,10 @@ __Requires__ = 'FreeCAD >= v0.20'
 __Communication__ = ''
 __Files__ = 'Fractly'
 
-from Fractyl import #tbd
+from Fractyl import Column_Fill, Create_Web, dmkb_keyplate, Rotate_To_Fingers, Solid_From_Points
+
+if __name__ == "main":
+
+    doc = FreeCAD.activeDocument()
+    if doc is None:
+        doc = FreeCAD.newDocument()
