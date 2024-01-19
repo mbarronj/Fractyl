@@ -24,12 +24,39 @@ __Help__ = 'Try it out and play with it. It should be self explanatory'
 __Status__ = 'Alpha'
 __Requires__ = 'FreeCAD >= v0.20'
 __Communication__ = ''
-__Files__ = 'Fractly'
+__Files__ = 'Fractyl'
 
-from Fractyl import Column_Fill, Create_Web, dmkb_keyplate, Rotate_To_Fingers, Solid_From_Points
+import FreeCAD as App
 
-if __name__ == "main":
+#from Fractyl import dmkb_keyplate
+import Fractyl as fk
 
-    doc = FreeCAD.activeDocument()
-    if doc is None:
-        doc = FreeCAD.newDocument()
+keyrows = ['top','middle','bottom']
+fingers = ['point', 'index', 'ring', 'pinky']
+
+
+doc = App.activeDocument()
+if doc is None:
+    doc = App.newDocument()
+
+try:
+    App.Console.PrintMessage("Fractyl Keyboard Generation Macro Running . . . \n")
+    App.Console.PrintMessage("Reading Hand Measurement Data\n")
+    finger_data = fk.readHandData()
+
+    if finger_data is not None:
+        fk.create_Rotated_kps(finger_data)
+    else:
+        App.Console.PrintMessage("ERROR: Could not create key plates\n")
+        raise Exception("Fractyl Macro Error: No Keyplates Generated")
+
+    App.Console.PrintMessage("Filling web between keyplates\n")
+    fk.FillWeb(keyrows,fingers)
+
+    App.Console.PrintMessage("Filling gap between key Columns\n")
+    fk.fillColumns(fingers)
+except Exception as e:
+    App.Console.PrintMessage("Fractyl did not complete generation, exiting\n")
+    App.Console.PrintMessage(f"{e}")
+
+

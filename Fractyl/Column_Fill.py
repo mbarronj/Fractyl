@@ -45,20 +45,9 @@ class ColumnFill:
                 edge = Part.LineSegment(Bottom_Points[i],Bottom_Points[i+1]).toShape()
                 bottom_edge_list.append(edge)
                 App.Console.PrintMessage(f"Edge #{i} is : {edge}\n")
-
-            sorted_t_edge = Part.sortEdges(top_edge_list)
-            sorted_b_edge = Part.sortEdges(bottom_edge_list)
-
-            top_wire = []
-            for edge_group in sorted_t_edge:
-                top_wire.append(Part.Wire(edge_group))
-
-            bottom_wire = []
-            for edge_group in sorted_b_edge:
-                bottom_wire.append(Part.Wire(edge_group))
-            
-            #top_wire = Part.Wire(sorted_t_edge)
-            #bottom_wire = Part.Wire(sorted_b_edge)
+                
+            top_wire = Part.Wire(top_edge_list)
+            bottom_wire = Part.Wire(bottom_edge_list)
 
             # Get first and last edges to find endpoints
             # Necessary because points aren't guaranteed in order
@@ -88,7 +77,7 @@ class ColumnFill:
                         
             # Extrude wires
             top_face = top_wire.extrude(ext_vec)
-            bottom_face = bottom_wire.extrude(ext_vec.negative())
+            #bottom_face = bottom_wire.extrude(ext_vec.negative())
 
             # Connect top and bottom edges with additional wires to form a closed shape
             # ... Code to connect edges ...
@@ -100,7 +89,7 @@ class ColumnFill:
             # ... Code to create a solid ...
             
             # Update the feature
-            #fp.Shape = top_face  # Set the final shape
+            fp.Shape = top_face  # Set the final shape
 
 
 # Function to comprehend column structure and run geometry generators
