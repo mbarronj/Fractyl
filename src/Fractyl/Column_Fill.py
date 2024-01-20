@@ -1,5 +1,12 @@
+# pyright: reportMissingImports=false
+# Ignore freecad import errors in VSCode etc
+
+# Reference:
+# https://wiki.freecad.org/Vector_API
+
 import FreeCAD as App
 import Part
+import Draft
 from FreeCAD import Base
 
 keyrows = ['top','middle','bottom']
@@ -31,6 +38,8 @@ class ColumnFill:
             # enclose as Solid
             Top_Points = fp.Top_Points
             Bottom_Points = fp.Bottom_Points
+
+            # eliminate duplicate points, sort for later
             
             top_edge_list = []
             bottom_edge_list = []
@@ -46,20 +55,25 @@ class ColumnFill:
                 bottom_edge_list.append(edge)
                 App.Console.PrintMessage(f"Edge #{i} is : {edge}\n")
 
+            
+            """
             sorted_t_edge = Part.sortEdges(top_edge_list)
             sorted_b_edge = Part.sortEdges(bottom_edge_list)
 
-            top_wire = []
+            top_wire_list = []
             for edge_group in sorted_t_edge:
-                top_wire.append(Part.Wire(edge_group))
+                top_wire_list.append(Part.Wire(edge_group))
 
-            bottom_wire = []
+            bottom_wire_list = []
             for edge_group in sorted_b_edge:
-                bottom_wire.append(Part.Wire(edge_group))
+                bottom_wire_list.append(Part.Wire(edge_group))
             
+            top_wire = Draft.join_wires(top_wire_list)
+            bottom_wire = Draft.join_wires(bottom_wire_list)
+
             #top_wire = Part.Wire(sorted_t_edge)
             #bottom_wire = Part.Wire(sorted_b_edge)
-
+            """
             # Get first and last edges to find endpoints
             # Necessary because points aren't guaranteed in order
             # Due to geometry orientation
@@ -100,7 +114,7 @@ class ColumnFill:
             # ... Code to create a solid ...
             
             # Update the feature
-            #fp.Shape = top_face  # Set the final shape
+            fp.Shape = top_face  # Set the final shape
 
 
 # Function to comprehend column structure and run geometry generators

@@ -1,4 +1,5 @@
-import FreeCAD
+# pyright: reportMissingImports=false
+import FreeCAD as App
 import Part, math
 
 # print(App.Units.Length)

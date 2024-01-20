@@ -1,3 +1,4 @@
+# pyright: reportMissingImports=false
 import FreeCAD as App
 from FreeCAD import Base
 

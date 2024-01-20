@@ -1,3 +1,5 @@
+# pyright: reportMissingImports=false, reportUnusedVariable=false, reportUndefinedVariable=false
+# Clearning error warnings for now - should really just install PySide. . .
 # -*- coding: utf-8 -*-
 import PySide
 import json

@@ -1,3 +1,4 @@
+# pyright: reportMissingImports=false
 import FreeCAD as App
 import Part, math
 
@@ -7,9 +8,7 @@ botvec = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]]
 topvec = [[0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]]
 
 # FreeCAD parametric Object version of the Dactly Manuform python port by ashreve
-"""
 
-"""
 # TEMPORARY CONSTANT VARIABLES
 keyswitch_height = 14.0
 keyswitch_width = 14.0

@@ -1,3 +1,4 @@
+# pyright: reportMissingImports=false
 # -*- coding: utf-8 -*-
 # Fractyl Keyboard generator: 
 # Like its earlier cousins, generates a tented,

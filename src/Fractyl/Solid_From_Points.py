@@ -1,5 +1,6 @@
-import FreeCAD as App
-import Part, math
+import FreeCAD as App # type: ignore
+import Part # type: ignore
+import math 
 
 # print(App.Units.Length)
 
@@ -93,6 +94,6 @@ if __name__ == '__main__':
     App.Console.PrintMessage("Running as main from Solid_From_Points")
     myObj = App.ActiveDocument.addObject("Part::FeaturePython", "Box")
     #ParametricCube(myObj)
-    GenerateSolid(myObj,myList)
+    GenerateSolid(myObj,botvec.extend(topvec))
     myObj.ViewObject.Proxy = 0 # This is mandatory unless we code the ViewProvider too.
     App.ActiveDocument.recompute()
