@@ -26,11 +26,22 @@ __Status__ = 'Alpha'
 __Requires__ = 'FreeCAD >= v0.20'
 __Communication__ = ''
 __Files__ = 'Fractyl'
+import importlib # for reloading modules during test
+# for working with individual modules, in the FreeCAD Python console:
+# import importlib
+# pth = App.getUserAppDataDir()
+# mcr = pth+macro_file_name
+# reload(mcr)
+# or
+#pth = r"C:\Users\mbarr\OneDrive\Documents\01. Projects\03_SW_Dev\Fractyl\src\Fractyl"
+#filename = "FractylKeyboard.FCMacro" # "Mesh_From_Points.py"
+#exec(open(pth + "\\" + filename).read())
 
 import FreeCAD as App
 
 #from Fractyl import dmkb_keyplate
-import Fractyl as fk
+import Fractyl
+#importlib.reload(Fractyl)
 
 keyrows = ['top','middle','bottom']
 fingers = ['point', 'index', 'ring', 'pinky']
@@ -43,19 +54,21 @@ if doc is None:
 try:
     App.Console.PrintMessage("Fractyl Keyboard Generation Macro Running . . . \n")
     App.Console.PrintMessage("Reading Hand Measurement Data\n")
-    finger_data = fk.readHandData()
+    finger_data = Fractyl.readHandData()
 
     if finger_data is not None:
-        fk.create_Rotated_kps(finger_data)
+        Fractyl.create_Rotated_kps(finger_data)
     else:
         App.Console.PrintMessage("ERROR: Could not create key plates\n")
         raise Exception("Fractyl Macro Error: No Keyplates Generated")
 
     App.Console.PrintMessage("Filling web between keyplates\n")
-    fk.FillWeb(keyrows,fingers)
+    Fractyl.FillWeb(keyrows,fingers)
 
     App.Console.PrintMessage("Filling gap between key Columns\n")
-    fk.fillColumns(fingers)
+    Fractyl.fillColumnMesh(fingers)
+
+    
 except Exception as e:
     App.Console.PrintMessage("Fractyl did not complete generation, exiting\n")
     App.Console.PrintMessage(f"{e}")

@@ -137,7 +137,7 @@ def fillColumns(Column_Name_List):
         ('UNDERCUT','Lower','Right'): 'Edge16',
         ('UNDERCUT','Lower', 'Left'): 'Edge4',
         ('WEB','Upper','Right'):'Edge8',
-        ('WEB','Upper', 'Left'):'Edge1',
+        ('WEB','Upper', 'Left'):'Edge10',
         ('WEB','Lower','Right'):'Edge5',
         ('WEB','Lower', 'Left'):'Edge7'
     }
@@ -200,5 +200,10 @@ def fillColumns(Column_Name_List):
 
 # Add feature to the document
 if __name__ == '__main__':
+    """
+    Not currently working, using Mesh_From_Points instead.
+    Will probably fix
+    TODO: Fix this. initial error in edge table likely root of problems
+    """
     #makeColumnFill()
     fillColumns(fingers)

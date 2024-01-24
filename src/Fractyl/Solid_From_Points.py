@@ -23,6 +23,11 @@ topvec = [[0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]]
 # Generates a solid from a list of points.
 # all 4 points on a side must be in a plane - this is a specific geometry condition requirement
 class GenerateSolid:
+    """
+    Intended for creating cubes.
+    Could be extended to generic shapes with a hull algorithm
+    from scipy etc
+    """    
     def __init__(self, obj,list_of_points):
         obj.Proxy = self
         #print(list_of_points)
