@@ -2,6 +2,9 @@
 import FreeCAD as App
 import Part
 import Mesh
+from FreeCAD import Base
+import math
+from .Solid_From_Points import GenerateSolid
 
 ####
 # Generates a shape from a list of points
@@ -29,6 +32,50 @@ edge_table = {
 
 keyrows = ['top','middle','bottom']
 fingers = ['point', 'index', 'ring', 'pinky']
+
+def addPiping(pts_list,radius = 1, pipname = 'pip_'):
+    """Adds small cylinders intended to allow easier fuse/union by OCC"""
+    if len(pts_list) == 2:
+        start_pt = pts_list[0]
+        end_pt = pts_list[1]
+        # probably smart to check both, but man that's a lot of work...sigh
+        if isinstance(start_pt, Base.Vector) and isinstance(end_pt, Base.Vector): 
+            cyl_vec = start_pt.sub(end_pt)
+            vert = Base.Vector(0,0,1)
+            # Vector Magic
+            angle = math.degrees(vert.getAngle(cyl_vec)) # vector angle in rad
+            length = end_pt.distanceToPoint(start_pt)
+            rotvec = Base.Vector(1,0,0) #start_pt.cross(end_pt) #cross product is unneeded
+            
+            # Create rotation
+            rotation = Base.Rotation(rotvec, -(angle + 180)) # rotation needs degrees, quadrant correction
+
+            # Create translation
+            translation = start_pt
+
+            # Combine translation and rotation into a transformation matrix
+            place = App.Placement()
+            place.Base = translation
+            place.Rotation = rotation   
+
+            # Now Create Geometry
+            doc = App.activeDocument()
+
+            cylinder = doc.addObject("Part::Cylinder", pipname)
+            cylinder.Radius = radius
+            cylinder.Height = length
+            cylinder.Placement = place
+
+            doc.recompute()
+            return cylinder
+        else:
+            App.Console.PrintMessage(f"either {start_pt} or {end_pt} were not actually {type(Base.Vector)}\n")
+            return None
+    else:
+         App.Console.PrintMessage(f"{len(pts_list)} was not equal to 2\n")
+         return None
+
+
 
 def eliminateDupes(pts):
     """Examines X,Y,Z, coordinates of FC Points/vectors to determine similarity """
@@ -98,6 +145,7 @@ def fillColumnMesh(Column_Name_List):
     # Process pairs of columns
     for i in range(0, len(column_list) - 1):
         App.Console.PrintMessage(f"Currently getting column {i} and {i+1}\n")
+        cname = column_list[i]
         column1 = [obj for obj in plate_objects if obj.Label.split('_')[0] == column_list[i]]
         column2 = [obj for obj in plate_objects if obj.Label.split('_')[0] == column_list[i + 1]]
 
@@ -147,57 +195,91 @@ def fillColumnMesh(Column_Name_List):
         bl_pts = eliminateDupes(bl_pts)
         tr_pts = eliminateDupes(tr_pts)
         br_pts = eliminateDupes(br_pts)
-        # Mesh Generic
-        mesh = Mesh.Mesh() # Creates a generic mesh object to manipulate
-        # Add Facet takes 3 vectors as input
-        # Assuming equal numbers of points, arranged in order, no dupes
-        # Top surfaces
-        for i in range(1,len(tl_pts)):
-            mesh.addFacet(tl_pts[i-1],tl_pts[i],tr_pts[i-1]) # first corner
-            mesh.addFacet(tl_pts[i],tr_pts[i],tr_pts[i-1]) # second corner
-        # bottom surfaces
-        for i in range(1,len(bl_pts)):
-            mesh.addFacet(bl_pts[i-1],bl_pts[i],br_pts[i-1]) # first corner
-            mesh.addFacet(bl_pts[i],br_pts[i],br_pts[i-1]) # second corner
-        # Left Surface
-        for i in range(1,len(bl_pts)):
-            mesh.addFacet(tl_pts[i-1],tl_pts[i],bl_pts[i-1]) # first corner
-            mesh.addFacet(bl_pts[i-1],bl_pts[i],tl_pts[i]) # second corner
-        # Right Surface
-        for i in range(1,len(bl_pts)):
-            mesh.addFacet(tr_pts[i-1],tr_pts[i],br_pts[i-1]) # first corner
-            mesh.addFacet(br_pts[i-1],br_pts[i],tr_pts[i]) # second corner
-        # front surface
-        mesh.addFacet(tl_pts[0],bl_pts[0],tr_pts[0]) # first corner
-        mesh.addFacet(tr_pts[0],br_pts[0],bl_pts[0]) # second corner
-        # rear surface
-        mesh.addFacet(tl_pts[-1],bl_pts[-1],tr_pts[-1]) # first corner
-        mesh.addFacet(tr_pts[-1],br_pts[-1],bl_pts[-1]) # second corner
         
-        # Make and Refine Mesh Object
-        App.Console.PrintMessage(f"\nColumn Index is: {i}\n")
-        meshObj = doc.addObject("Mesh::Feature", "MeshFill")
-        meshObj.Mesh = mesh
-        meshObj.fixIndices()
-        meshObj.harmonizeNormals()
+        # Loop over points by pairs, create 4-sided solid
+        for k in range(len(tl_pts)-1):
+            # taking sides of each column as the "top" or "bottom"
+            # Have to remember that points need to run in RH order
+            myVecList = [ tl_pts[k],tl_pts[k+1],bl_pts[k+1],bl_pts[k],tr_pts[k],tr_pts[k+1],br_pts[k+1],br_pts[k]]
+            myObj = doc.addObject("Part::FeaturePython", cname+"_columnfill_solid_"+str(k))
+            GenerateSolid(myObj, myVecList)
+            myObj.ViewObject.Proxy = 0 # not coding viewprovider
+            doc.recompute()
+
+
+        ####
+        # Mesh Generation - problematic and complicated.
+        # Switching to generating solids with the now-cleanly arranged points
+        ####
+
+        # # Mesh Generic
+        # mesh = Mesh.Mesh() # Creates a generic mesh object to manipulate
+        # # Add Facet takes 3 vectors as input
+        # # Assuming equal numbers of points, arranged in order, no dupes
+        # # Top surfaces
+        # for i in range(1,len(tl_pts)):
+        #     mesh.addFacet(tl_pts[i-1],tl_pts[i],tr_pts[i-1]) # first corner
+        #     mesh.addFacet(tl_pts[i],tr_pts[i],tr_pts[i-1]) # second corner
+        # # bottom surfaces
+        # for i in range(1,len(bl_pts)):
+        #     mesh.addFacet(bl_pts[i-1],bl_pts[i],br_pts[i-1]) # first corner
+        #     mesh.addFacet(bl_pts[i],br_pts[i],br_pts[i-1]) # second corner
+        # # Left Surface
+        # for i in range(1,len(bl_pts)):
+        #     mesh.addFacet(tl_pts[i-1],tl_pts[i],bl_pts[i-1]) # first corner
+        #     mesh.addFacet(bl_pts[i-1],bl_pts[i],tl_pts[i]) # second corner
+        # # Right Surface
+        # for i in range(1,len(bl_pts)):
+        #     mesh.addFacet(tr_pts[i-1],tr_pts[i],br_pts[i-1]) # first corner
+        #     mesh.addFacet(br_pts[i-1],br_pts[i],tr_pts[i]) # second corner
+        # # front surface
+        # mesh.addFacet(tl_pts[0],bl_pts[0],tr_pts[0]) # first corner
+        # mesh.addFacet(tr_pts[0],br_pts[0],bl_pts[0]) # second corner
+        # # rear surface
+        # mesh.addFacet(tl_pts[-1],bl_pts[-1],tr_pts[-1]) # first corner
+        # mesh.addFacet(tr_pts[-1],br_pts[-1],bl_pts[-1]) # second corner
         
-        # Print the label 
-        App.Console.PrintMessage(f"\nMesh Object info: {meshObj.Label}\n")
-        # Make solid object
-        solidObj = doc.addObject('Part::Feature', f"ColumnFill_{i}")
-        tempshape = Part.Shape()
-        tempshape.makeShapeFromMesh(meshObj.Mesh.Topology, 0.100000, False)
-        solidObj.Shape = tempshape
-        solidObj.purgeTouched() # No clue why this is needed, but it's critical
-        # Still Actually not a solid shape, just a shell
-        # Solidify shell into solid part
-        __s__=solidObj.Shape.Faces
-        __s__=Part.Solid(Part.Shell(__s__))
-        __o__=doc.addObject("Part::Feature",f"ColumnFill_solid_{i}")
-        __o__.Shape=__s__
-        App.Console.PrintMessage(f"\nFinished with column fill: {__o__.Label}\n")
-        App.ActiveDocument.recompute()
+        # # Make and Refine Mesh Object
+        # App.Console.PrintMessage(f"\nColumn Index is: {i}\n")
+        # meshObj = doc.addObject("Mesh::Feature", "MeshFill")
+        # meshObj.Mesh = mesh
+        # meshObj.fixIndices()
+        # meshObj.harmonizeNormals()
         
+        # # Print the label 
+        # App.Console.PrintMessage(f"\nMesh Object info: {meshObj.Label}\n")
+        # # Make solid object
+        # solidObj = doc.addObject('Part::Feature', f"ColumnFill_{i}")
+        # tempshape = Part.Shape()
+        # tempshape.makeShapeFromMesh(meshObj.Mesh.Topology, 0.050000, False)
+        # solidObj.Shape = tempshape
+        # solidObj.purgeTouched() # No clue why this is needed, but it's critical
+        # # Still Actually not a solid shape, just a shell
+        # # Solidify shell into solid part
+        # __s__=solidObj.Shape.Faces
+        # __s__=Part.Solid(Part.Shell(__s__))
+        # __o__=doc.addObject("Part::Feature",f"{cname}_ColumnFill_solid_{i}")
+        # __o__.Shape=__s__
+        # #Part.show(__o__)
+        # __o__.purgeTouched() # maybe important here too?
+        # # Hide surf and mesh
+        # solidObj.Visibility = False
+        # meshObj.Visibility = False
+        # App.Console.PrintMessage(f"\nFinished with column fill: {__o__.Label}\n")
+        doc.recompute()
+
+        # Add piping for later fuse ops
+        # points should already be sorted
+        for idx in range(len(bl_pts)-1):
+            pipe = addPiping([bl_pts[idx],bl_pts[idx+1]],radius=1,pipname=cname+"_pip_") # radius = 1 by default
+            pipe = addPiping([br_pts[idx],br_pts[idx+1]],radius=1,pipname=cname+"_pip_")
+            if pipe is not None:
+                App.Console.PrintMessage("added pipe\n")
+            else:
+                App.Console.PrintMessage(f"Error adding pipe:{[bl_pts[idx],bl_pts[idx+1]]} ")
+        
+        # Recompute one last time
+        doc.recompute()
         
     return None
     

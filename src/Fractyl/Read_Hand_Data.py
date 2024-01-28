@@ -1,6 +1,7 @@
 # pyright: reportMissingImports=false, reportUnusedVariable=false, reportUndefinedVariable=false
 # Clearning error warnings for now - should really just install PySide. . .
 # -*- coding: utf-8 -*-
+import os.path
 import PySide
 import json
 from PySide import QtGui ,QtCore
@@ -12,17 +13,26 @@ import FreeCAD as App
 path = App.ConfigGet("UserAppData")
 
 def readHandData():
-    App.Console.PrintMessage("ReadHandData: Attempting to Open File Dialog\n")
+    OpenName = None
     finger_data = None
-    OpenName = ""
-    try:
-        OpenName = QFileDialog.getOpenFileName(None,QString.fromLocal8Bit("Read a JSON file"),path,"*.json") # PyQt4
-    #                                                                     "here the text displayed on windows" "here the filter (extension)"   
-    except Exception:
-        OpenName, Filter = PySide.QtGui.QFileDialog.getOpenFileName(None, "Read a JSON file", path,"*.json") #PySide
+    # Check for default file
+    default_path = "Macro\\Fractyl\\default_hand.json"
+    if os.path.isfile(path + default_path):
+        OpenName = path + default_path
+        App.Console.PrintMessage(f"ReadHandData: default hand geometry found at {default_path}\n")
+    
+    if OpenName is None:
+        OpenName = ""
+        App.Console.PrintMessage("ReadHandData: Attempting to Open File Dialog\n")
+        try:
+            OpenName = QFileDialog.getOpenFileName(None,QString.fromLocal8Bit("Read a JSON file"),path,"*.json") # PyQt4
+        #                                                                     "here the text displayed on windows" "here the filter (extension)"   
+        except Exception:
+            OpenName, Filter = PySide.QtGui.QFileDialog.getOpenFileName(None, "Read a JSON file", path,"*.json") #PySide
     #                                                                     "here the text displayed on windows" "here the filter (extension)"   
     if OpenName == "":                                                            # if the name file are not selected then Abord process
         App.Console.PrintMessage("Process aborted"+"\n")
+        return None
     else:
         App.Console.PrintMessage("Reading "+OpenName+"\n")                        # text displayed to Report view (Menu > View > Report view checked)
         try:                                                                      # detect error to read file

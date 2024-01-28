@@ -68,6 +68,9 @@ try:
     App.Console.PrintMessage("Filling gap between key Columns\n")
     Fractyl.fillColumnMesh(fingers)
 
+    App.Console.PrintMessage("Fusing Objects\n")
+    Fractyl.Fuse_Objects()
+    Fractyl.Rotate_Object()
     
 except Exception as e:
     App.Console.PrintMessage("Fractyl did not complete generation, exiting\n")

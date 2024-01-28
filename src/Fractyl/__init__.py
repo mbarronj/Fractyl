@@ -5,3 +5,4 @@ from .Rotate_To_Fingers import create_Rotated_kps
 from .Solid_From_Points import GenerateSolid
 from .Read_Hand_Data import readHandData
 from .Mesh_From_Points import fillColumnMesh
+from .Rotate_Tent import Fuse_Objects, Rotate_Object

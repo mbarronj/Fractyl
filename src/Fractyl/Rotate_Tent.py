@@ -50,63 +50,91 @@ def Fuse_Objects():
         
         # dict of lists of columns
         column_obj_dict = { str(col): [] for col in fingers}
-        fill_obj_list = []
+        #fill_obj_list = [] # Not needed for MultiFuse
         # grab items in a given column
         for obj in solid_objects:
             # Check Label against column names, store index
             labelstr = obj.Label.split('_')
             try:
+                # if label is in fingers
                 column_obj_dict[labelstr[0]].append(obj)
+                # no need to append to fill obj list seperately, handled by naming solids
+                #fill_obj_list.append(obj)
             except KeyError:
                 App.Console.PrintMessage(f"\n{labelstr[0]} not found in column list\n")
-                if labelstr[0] == "ColumnFill":
-                    fill_obj_list.append(obj)
+                #if labelstr[0] == "ColumnFill" and labelstr[1] == "solid":
+                #    fill_obj_list.append(obj)
                 continue
         
         # Fuse each column seperately. Then fuse column fill solid objects in order
-        fused_cols = []
+        #fused_cols = []
+        newShapeList = []
+        fusion = App.activeDocument().addObject("Part::MultiFuse",keyname)#"Whole_MultiFuse")
         for col in fingers:
             
             obj_list = column_obj_dict[col]
-            newShape = obj_list.pop(0).Shape
+            #newShape = obj_list.pop(0).Shape
+            #newShapeList = [obj_list.pop(0)] # not needed if we arent piggybacking on .fuse
+            # newShapeList = [] # removing - attempting to MultiFuse everything
+            #fusion = App.activeDocument().addObject("Part::MultiFuse",col+"_fuse")
+            #App.activeDocument().Fusion.Shapes = [App.activeDocument().Tube,App.activeDocument().Box,]
+            
             for i in obj_list:
-                App.Console.PrintMessage(f"\n{i.Label} added to fuse for {col}\n")
                 if i.isDerivedFrom("Part::Feature"):
-                    newShape = newShape.fuse(i.Shape) # note: MultiFuse is deprecated, use fuse
-                    i.Visibility = False
+                    newShapeList.append(i)
+                    App.Console.PrintMessage(f"\n{i.Label} added to fuse for {col}\n")
+                    #newShape = newShape.fuse(i.Shape) # note: MultiFuse is deprecated, use fuse
+                    #i.Visibility = False
+            
+            #fusion.Shapes = newShapeList
             # Add column fill
-            if len(fill_obj_list) > 0:
-                newShape = newShape.fuse(fill_obj_list.pop(0).Shape)
-            newObject = App.ActiveDocument.addObject("Part::Feature",col+"_fuse")
-            newObject.Shape = newShape
-            fused_cols.append(newObject)
-            doc.recompute()
+            # Not needed since we are naming the solid fill and including in multifuse
+            # if len(fill_obj_list) > 0:
+            #     #newShape = newShape.fuse(fill_obj_list.pop(0).Shape)
+            #     newShapeList.append(fill_obj_list.pop(0))
+            #newObject = App.ActiveDocument.addObject("Part::Feature",col+"_fuse")
+            #newObject.Shape = newShape
+            
+            # fusion.Shapes = newShapeList            
+            # doc.recompute()
+            # fusion.purgeTouched() # Maybe?
+            # fused_cols.append(fusion)
+            # #fused_cols.append(newObject)
+            # doc.recompute()
+        fusion.Shapes = newShapeList
+        doc.recompute()
+
+        # Use MultiFuse as above
+        App.Console.PrintMessage(f"Fusing Whole\n Using MultiFuse\n")
+        #whole_fusion = App.activeDocument().addObject("Part::MultiFuse","Whole_Fuse")
+        #whole_fusion.Shapes = fused_cols # Must be document objects
         
         # Repeat for new fused columns
-        App.Console.PrintMessage(f"\nFusing Whole\n\n{fingers[0]} is initial shape for whole \n")
-        newShape = fused_cols.pop(0).Shape
-        App.Console.PrintMessage(f"\nSeed Shape is:{newShape} - {type(newShape)} -\n")
+        #App.Console.PrintMessage(f"\nFusing Whole\n\n{fingers[0]} is initial shape for whole \n")
+        #newShape = fused_cols.pop(0).Shape
+        #App.Console.PrintMessage(f"\nSeed Shape is:{newShape} - {type(newShape)} -\n")
         #newShape.Visibility = False
-        for i in fused_cols:
-            App.Console.PrintMessage(f"\nFusing {i.Label} to whole (type: {type(i)} )\n")
-            if i.isDerivedFrom("Part::Feature"):
-                newShape = newShape.fuse(i.Shape) 
-                i.Visibility = False
-        newObject = App.ActiveDocument.addObject("Part::Feature","whole_fuse")
-        newObject.Shape = newShape
-        doc.recompute()
+        # for i in fused_cols:
+        #     App.Console.PrintMessage(f"\nFusing {i.Label} to whole (type: {type(i)} )\n")
+        #     if i.isDerivedFrom("Part::Feature"):
+        #         newShape = newShape.fuse(i.Shape) 
+        #         i.Visibility = False
+        #newObject = App.ActiveDocument.addObject("Part::Feature","whole_fuse")
+        #newObject.Shape = newShape
+        #doc.recompute()
 
     else:
         App.Console.PrintMessage("\n\nError: did not collect objects\n\n")
 
     return count
 
-def Rotate_Object(angle):
+def Rotate_Object(angle = wrist_angle):
+    """ Defaults to constant wrist_angle. In degrees"""
     doc = App.activeDocument()
     # Create rotation: about Y, angle in Degrees, Right-Hand Rule
     rotation = Base.Rotation(Base.Vector(0, 1, 0), angle)
 
-    obj = doc.getObject(keyname)
+    obj = doc.getObject(keyname) # currently the constant name of the whole multifuse
 
     place = App.Placement()
     #place.Base = rotated_translation # Can Also Translate when/if needed

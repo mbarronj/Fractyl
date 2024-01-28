@@ -1,0 +1,70 @@
+{
+    "point": {
+        "Joint_1": {
+            "Length": 40,
+            "Angle Start": 30,
+            "Angle End": 50
+        },
+        "Joint_2": {
+            "Length": 25,
+            "Angle Start": 0,
+            "Angle End": 0
+        },
+        "Joint_3": {
+            "Length": 25,
+            "Angle Start": 0,
+            "Angle End": 0
+        }
+    },
+    "index": {
+        "Joint_1": {
+            "Length": 45,
+            "Angle Start": 30,
+            "Angle End": 50
+        },
+        "Joint_2": {
+            "Length": 29,
+            "Angle Start": 0,
+            "Angle End": 0
+        },
+        "Joint_3": {
+            "Length": 29,
+            "Angle Start": 0,
+            "Angle End": 0
+        }
+    },
+    "ring": {
+        "Joint_1": {
+            "Length": 42,
+            "Angle Start": 30,
+            "Angle End": 50
+        },
+        "Joint_2": {
+            "Length": 29,
+            "Angle Start": 0,
+            "Angle End": 0
+        },
+        "Joint_3": {
+            "Length": 26,
+            "Angle Start": 0,
+            "Angle End": 0
+        }
+    },
+    "pinky": {
+        "Joint_1": {
+            "Length": 33,
+            "Angle Start": 30,
+            "Angle End": 50
+        },
+        "Joint_2": {
+            "Length": 22,
+            "Angle Start": 0,
+            "Angle End": 0
+        },
+        "Joint_3": {
+            "Length": 22,
+            "Angle Start": 0,
+            "Angle End": 0
+        }
+    }
+}
