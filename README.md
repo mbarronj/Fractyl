@@ -1,4 +1,4 @@
-# Fractyl - FreeCAD Native parametric ergo split keyboard
+# Fractyl - FreeCAD Native Parametric Ergo Split Keyboard
 
 ![image](https://github.com/mbarronj/Fractyl/assets/5118224/eb98037c-8ec3-4dec-a645-673475469a36)
 
