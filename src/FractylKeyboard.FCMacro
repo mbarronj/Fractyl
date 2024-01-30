@@ -38,6 +38,16 @@ import importlib # for reloading modules during test
 #exec(open(pth + "\\" + filename).read())
 
 import FreeCAD as App
+import FreeCADGui as Gui
+
+# Ensure we have a new document before attempting any further import, if needed
+try:
+    doc = App.activeDocument()
+except Exception as e:
+    App.Console.PrintMessage("Fractyl - no open file. Creating new file\n")
+    #if doc is None:
+    doc = App.newDocument()
+
 
 #from Fractyl import dmkb_keyplate
 import Fractyl
@@ -46,10 +56,6 @@ import Fractyl
 keyrows = ['top','middle','bottom']
 fingers = ['point', 'index', 'ring', 'pinky']
 
-
-doc = App.activeDocument()
-if doc is None:
-    doc = App.newDocument()
 
 try:
     App.Console.PrintMessage("Fractyl Keyboard Generation Macro Running . . . \n")
@@ -72,6 +78,10 @@ try:
     Fractyl.Fuse_Objects()
     Fractyl.Rotate_Object()
     
+    App.Console.PrintMessage("Creating Thumb Key Plates\n")
+    Fractyl.create_thumbpad()
+    
+    Gui.SendMsgToActiveView("ViewFit")
 except Exception as e:
     App.Console.PrintMessage("Fractyl did not complete generation, exiting\n")
     App.Console.PrintMessage(f"{e}")

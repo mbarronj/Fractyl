@@ -2,8 +2,8 @@
     "point": {
         "Joint_1": {
             "Length": 40,
-            "Angle Start": 30,
-            "Angle End": 50
+            "Angle Start": 25,
+            "Angle End": 55
         },
         "Joint_2": {
             "Length": 25,
@@ -19,8 +19,8 @@
     "index": {
         "Joint_1": {
             "Length": 45,
-            "Angle Start": 30,
-            "Angle End": 50
+            "Angle Start": 25,
+            "Angle End": 55
         },
         "Joint_2": {
             "Length": 29,
@@ -36,8 +36,8 @@
     "ring": {
         "Joint_1": {
             "Length": 42,
-            "Angle Start": 30,
-            "Angle End": 50
+            "Angle Start": 25,
+            "Angle End": 55
         },
         "Joint_2": {
             "Length": 29,
@@ -53,8 +53,8 @@
     "pinky": {
         "Joint_1": {
             "Length": 33,
-            "Angle Start": 30,
-            "Angle End": 50
+            "Angle Start": 25,
+            "Angle End": 55
         },
         "Joint_2": {
             "Length": 22,

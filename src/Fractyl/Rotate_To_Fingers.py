@@ -1,6 +1,6 @@
 # pyright: reportMissingImports=false
 import FreeCAD as App
-import FreeCADGui as Gui
+#import FreeCADGui as Gui
 #import json
 import math
 from FreeCAD import Base
@@ -13,14 +13,14 @@ def deg_to_rad(deg):
     return deg * math.pi / 180
 
 
-# Function to create a transformation matrix for a single angle
+# Function to create a transformation matrix for a single joint
 #this should return freeCAD Placements
 def create_transformation(length, angle):
-    # Convert angle to radians
-    angle_rad = deg_to_rad(angle)
+    # Convert angle to radians - not needed
+    #angle_rad = deg_to_rad(angle)
 
     # Create rotation
-    rotation = Base.Rotation(Base.Vector(1, 0, 0), -angle)#_rad)
+    rotation = Base.Rotation(Base.Vector(1, 0, 0), -angle)
 
     # Rotate the translation vector
     translation = Base.Vector(0, length, 0)
@@ -59,7 +59,7 @@ def create_Rotated_kps(finger_data):
     #with open(filepath, 'r') as file:
     #    finger_data = json.load(file)
 
-    keyrows = ['middle', 'top','bottom']
+    keyrows = ['top','middle', 'bottom']
 
     # Create transformations and apply them to an object
     for row in keyrows:
@@ -111,6 +111,6 @@ def create_Rotated_kps(finger_data):
                 #max_extension_matrix = create_transformation(joint_data["Length"], joint_data["Angle Start"])
                 #max_extension_object.Placement = App.Placement(max_extension_matrix)
             placeholder_object.Placement = placeholder_object.Placement.multiply(rot90x)
-
-    Gui.SendMsgToActiveView("ViewFit")
+    
     return None
+
