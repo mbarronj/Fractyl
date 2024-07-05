@@ -2,21 +2,33 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Copy Files",
+            "label": "Copy FC Macro",
             "type": "shell",
-            "command": "xcopy",
-            "args": [
-                "${workspaceFolder}\\src\\*", // Source path
-                "${userHome}\\AppData\\Roaming\\FreeCAD\\Macro", // Destination path
-                "/E", // Copies directories and subdirectories, including empty ones.
-                "/I", // If destination does not exist and copying more than one file, assumes that destination must be a directory.
-                "/Y"  // Suppresses prompting to confirm you want to overwrite an existing destination file.
-            ],
+            "windows":{
+                "command": "xcopy",
+                "args": [
+                    "${workspaceFolder}\\src\\*", // Source path
+                    "${userHome}\\AppData\\Roaming\\FreeCAD\\Macro", // Destination path
+                    "/E", // Copies directories and subdirectories, including empty ones.
+                    "/I", // If destination does not exist and copying more than one file, assumes that destination must be a directory.
+                    "/Y"  // Suppresses prompting to confirm you want to overwrite an existing destination file.
+                ],
+            },
+            "linux":{
+                "command": "cp",
+                "args": [
+                    "-r",
+                    "${workspaceFolder}/src/*", // Source path
+                    "${userHome}/.local/share/FreeCAD/Macro", // Destination path
+
+                ]
+            },
             "problemMatcher": [],
             "group": {
                 "kind": "build",
                 "isDefault": true
             }
         }
+
     ]
 }
